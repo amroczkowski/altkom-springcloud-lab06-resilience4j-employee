@@ -2,14 +2,17 @@ package pl.altkom.springcloud.lab06.resilience4j.employeeservice.controller;
 
 import java.util.List;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
@@ -35,6 +38,13 @@ public class EmployeeController {
     @GetMapping("/project/{projectId}")
     public List<Employee> getProjectEmployees(@PathVariable("projectId") final Long projectId) {
         log.info("Getting project {} employees", projectId);
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
         return employeeService.getProjectEmployees(projectId);
     }
 
@@ -44,9 +54,10 @@ public class EmployeeController {
         return employeeService.getEmployee(id);
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public Employee createEmployee(@Valid @RequestBody final CreateEmployeeRequest request) {
-        return employeeService.addEmployee(request);
+        return employeeService.createEmployee(request);
     }
 
     @PutMapping("/{id}")
